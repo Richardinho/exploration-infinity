@@ -1,5 +1,11 @@
 +function () {
 
+	// todo: make into plugin
+
+	// todo: do we need inner container?
+
+	//  todo: consider aria roles
+
 	'use strict';
 
 	var previousScroll;
@@ -14,16 +20,19 @@
 	var upperBoundary;
 
 	// once this number of pages is rendered, start removing ones at beginning
+	// todo: configurable
 	var numberOfPagesToRender = 4;
 
 	var numberOfRenderedPages;
 
 	// cache pages here along with some metadata
+	//todo: configure cacheable?
 	var pageCache = [];
 
 	var container = document.querySelector('#container');
 	var innerContainer = document.querySelector('#inner-container');
 
+	//  todo: make asynchronous call
 	var pagesService = [
 		{  text : '1' },
 		{  text : '2' },
@@ -70,13 +79,15 @@
 
 			if(container.scrollTop > upperBoundary) {
 				pageIndex++;
-				//  reset boundaries
+
 				lowerBoundary = upperBoundary;
 				upperBoundary = upperBoundary + pageCache[pageIndex].height;
-				// update page in url
+
+				// todo: configure to be pushState or replaceState
 				history.pushState(null, null, pageIndex);
 
-				console.log('page', pageIndex);
+				// todo: implement pagination buttons?
+
 			}
 
 			if(beyondUpperLimit()) {
@@ -98,12 +109,11 @@
 			//  check lower boundary here for page change
 			if(container.scrollTop < lowerBoundary) {
 				pageIndex--;
-				//  reset boundaries
+
 				upperBoundary = lowerBoundary;
 				lowerBoundary = lowerBoundary - pageCache[pageIndex].height;
 
-				// update page in url
-				console.log('page', pageIndex);
+				//  todo: configure to be pushState or replaceState
 				history.pushState(null, null, pageIndex);
 			}
 
@@ -166,11 +176,6 @@
 		return container.scrollTop < 50;
 	}
 
-	function updatePagination(currentPageIndex) {
-
-		console.log('current page', currentPageIndex);
-	}
-
 	// utility functions
 
 	//  are we scrolling forwards or backwards
@@ -195,6 +200,7 @@
 		}
 	}
 
+	//  overridable
 	function _createPageElement(pageData) {
 
 		var el = document.createElement('div');
