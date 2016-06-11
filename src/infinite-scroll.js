@@ -1,4 +1,6 @@
-module.exports = function () {
+var _ = require('underscore');
+
+module.exports = function (options) {
 
 	//  todo: make into plugin
 
@@ -17,9 +19,15 @@ module.exports = function () {
 		paginationButtons : false,
 		cachePages : true,
 		createPageElement : function () {},
-		pageNumbers : false
+		pageNumbers : false,
+		getPage : function () {
+			throw {
+				message : 'getPage() not configured'
+			}
+		}
 	};
 
+	var config = _.extend({}, defaults, options);
 
 
 	//  keep track of what page we are on.
@@ -46,20 +54,7 @@ module.exports = function () {
 
 	if(!container || !innerContainer) return;
 
-	//  todo: make asynchronous call
-	var pagesService = [
-		{  text : '0' },
-		{  text : '1' },
-		{  text : '2' },
-		{  text : '3' },
-		{  text : '4' },
-		{  text : '5' },
-		{  text : '6' },
-		{  text : '7' },
-		{  text : '8' },
-		{  text : '9' },
-		{  text : '10' }
-	];
+
 
 	//  runs on page load
 	handleRequest();
@@ -203,7 +198,7 @@ module.exports = function () {
 		var pageData = pageCache[pageIndex];
 
 		if(!pageData) {
-			pageData = pagesService[pageIndex];
+			pageData = config.getPage(pageIndex);
 		}
 
 		if(pageData) {
