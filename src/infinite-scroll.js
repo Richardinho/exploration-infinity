@@ -1,14 +1,26 @@
-+function () {
+window.explorationInfinity = function (options) {
 
-	// todo: make into plugin
+	//  todo: make into plugin
 
-	// todo: do we need inner container?
+	//  todo: do we need inner container?
 
-	//  todo: consider aria roles
+	//  todo: consider aria roles and accessibility in general
 
 	'use strict';
 
 	var previousScroll;
+
+	var defaults = {
+		numberOfPagesToRender : 4,
+		containerSelector : '#container',
+		pushState : true,
+		paginationButtons : false,
+		cachePages : true,
+		createPageElement : function () {},
+		pageNumbers : false
+	};
+
+
 
 	//  keep track of what page we are on.
 	var pageIndex;
@@ -19,14 +31,14 @@
 	var lowerBoundary;
 	var upperBoundary;
 
-	// once this number of pages is rendered, start removing ones at beginning
-	// todo: configurable
+	//  once this number of pages is rendered, start removing ones at beginning
+	//  todo: configurable
 	var numberOfPagesToRender = 4;
 
 	var numberOfRenderedPages;
 
-	// cache pages here along with some metadata
-	//todo: configure cacheable?
+	//  cache pages here along with some metadata
+	//  todo: configure cacheable?
 	var pageCache = [];
 
 	var container = document.querySelector('#container');
@@ -34,6 +46,7 @@
 
 	//  todo: make asynchronous call
 	var pagesService = [
+		{  text : '0' },
 		{  text : '1' },
 		{  text : '2' },
 		{  text : '3' },
@@ -43,8 +56,7 @@
 		{  text : '7' },
 		{  text : '8' },
 		{  text : '9' },
-		{  text : '10' },
-		{  text : '11' }
+		{  text : '10' }
 	];
 
 	//  runs on page load
@@ -83,10 +95,10 @@
 				lowerBoundary = upperBoundary;
 				upperBoundary = upperBoundary + pageCache[pageIndex].height;
 
-				// todo: configure to be pushState or replaceState
+				//  todo: configure to be pushState or replaceState
 				history.pushState(null, null, pageIndex);
 
-				// todo: implement pagination buttons?
+				//  todo: implement pagination buttons?
 
 			}
 
@@ -219,4 +231,8 @@
 		parent.insertBefore(child, parent.firstElementChild);
 	}
 
-}();
+
+
+};
+
+window.explorationInfinity();
