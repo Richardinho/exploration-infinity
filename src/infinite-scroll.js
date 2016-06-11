@@ -44,6 +44,8 @@ module.exports = function () {
 	var container = document.querySelector('#container');
 	var innerContainer = document.querySelector('#inner-container');
 
+	if(!container || !innerContainer) return;
+
 	//  todo: make asynchronous call
 	var pagesService = [
 		{  text : '0' },
