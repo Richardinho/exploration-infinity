@@ -1,4 +1,4 @@
-window.explorationInfinity = function (options) {
+module.exports = function () {
 
 	//  todo: make into plugin
 
@@ -232,7 +232,6 @@ window.explorationInfinity = function (options) {
 	}
 
 
+}
 
-};
 
-window.explorationInfinity();

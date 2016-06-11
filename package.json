@@ -2,7 +2,7 @@
   "name": "exploration-infinity",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/infinite-scroll.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,5 +10,11 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.13.4"
+  },
+  "jspm": {
+    "directories": {
+      "baseURL": "src"
+    },
+    "dependencies": {}
   }
 }
