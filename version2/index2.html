@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<style>
+		* {
+		box-sizing : box-model;
+		}
+		body {
+			margin : 0;
+		}
+
+		#container {
+			position : relative;
+			width : 500px;
+			height : 300px;
+			border : solid 1px blue;
+			margin : auto;
+			margin-top : 100px;
+			overflow-y : scroll;
+			overflow-x : hidden;
+		}
+
+		#page-container > div  {
+			background : pink;
+			border-bottom : solid 2px green;
+			font-size : 1em;
+			height :200px;
+			overflow : hidden;
+			padding : 12px;
+		}
+
+		#spinner {
+			display : none;
+			position : fixed;
+			top : 0; bottom : 0; left : 0; right : 0;
+			line-height : 300px;
+			text-align : center;
+			font-size : 2em;
+			z-index : 3;
+			background : hsla(56, 87%, 56%, 0.5);
+		}
+
+		#spinner img {
+		size : 50px;
+		vertical-align : baseline;
+		}
+
+
+	</style>
+</head>
+<body>
+<div id='spinner'> Loading results..</div>
+<div id='container'>
+	<div id='page-container' class='pages'><div>
+		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+		labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
+		nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+		cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa
+		qui officia deserunt mollit anim id est laborum.
+
+	</div></div>
+
+</div>
+
+
+<script src="main.js"></script>
+<script>
+
+		infiniteScroll({
+			viewport : document.getElementById('container'),
+			pageContainer : document.getElementById('page-container'),
+			spinner : document.getElementById('spinner'),
+			content : document.getElementById('page-container'),
+			maxpages : 4
+		});
+	</script>
+</body>
+</html>

@@ -4,22 +4,24 @@
 	<meta charset="UTF-8">
 	<title></title>
 	<style>
+		body {
+			margin : 0;
+		}
+		h1 {
+			margin : 0;
+		}
 		* {
 			box-sizing : box-model;
 		}
-		#container {
-			border : solid 1px black;
-			width : 300px;
-			height : 200px;
-			margin : auto;
-			margin-top : 100px;
-			overflow-y : scroll;
-			position : relative;
+
+		.header {
+			background : yellow;
+			padding : 20px;
 		}
 
-		#inner-container {
-			width : 100%;
+		#page-container {
 		}
+
 		.page {
 			font-size : 1em;
 			overflow : hidden;
@@ -38,7 +40,7 @@
 			background : limegreen;
 		}
 		.page.medium {
-			background : pink;
+			background : blue;
 			font-size : 2em;
 		}
 		.page.large {
@@ -49,9 +51,8 @@
 		</style>
 </head>
 <body>
-	<div id='container'>
-		<div id='inner-container'></div>
-	</div>
+	<h1 class='header'>infinite scroll</h1>
+	<div id='page-container'></div>
 
 	<script src="jspm_packages/system.js"></script>
 	<script src="config.js"></script>

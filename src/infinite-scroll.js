@@ -2,19 +2,23 @@ var _ = require('underscore');
 
 module.exports = function (options) {
 
-	//  todo: make into plugin
 
-	//  todo: do we need inner container?
+	/*
+		The purpose of the inner container is so as to make it easy to measure the height of the combined pages.
+		The alternative would be to measure the individual pages separately.
+		I'm not sure but I think this is more performant?
+	*/
 
 	//  todo: consider aria roles and accessibility in general
 
 	'use strict';
 
 	var previousScroll;
+	
+	var offset;
 
 	var defaults = {
 		numberOfPagesToRender : 4,
-		containerSelector : '#container',
 		pushState : true,
 		paginationButtons : false,
 		cachePages : true,
@@ -40,40 +44,51 @@ module.exports = function (options) {
 	var upperBoundary;
 
 	//  once this number of pages is rendered, start removing ones at beginning
-	//  todo: configurable
-	var numberOfPagesToRender = 4;
 
 	var numberOfRenderedPages;
 
 	//  cache pages here along with some metadata
 	//  todo: configure cacheable?
-	var pageCache = [];
+	var pageData = [];
 
-	var container = document.querySelector('#container');
-	var innerContainer = document.querySelector('#inner-container');
+	var viewport = config.viewport;
+	var pageContent = config.pageContent;
+	var pageContainer = config.pageContainer;
 
-	if(!container || !innerContainer) return;
-
-
+	if(!viewport || !pageContainer) return;
 
 	//  runs on page load
 	handleRequest();
 
 	window.onpopstate = handleRequest;
 
+	function resetScroll() {
+		setScroll(0);
+	}
+
+	function setScroll(amount) {
+		if(viewport == window) {
+			document.body.scrollTop = amount;
+		} else {
+			viewport.scrollTop = amount;
+		}
+
+	}
+
 	function handleRequest() {
-		pageCache = [];
-		innerContainer.innerHTML = '';
+		pageData = [];
+		pageContainer.innerHTML = '';
 		numberOfRenderedPages = 0;
 		previousScroll = 0;
-		container.scrollTop = 0;
+		offset = 0;
+		resetScroll();
 		var path  = window.location.pathname.substring(1);
 		pageIndex = parseInt(path, 10);
 		var page = _getPage(pageIndex);
 		if(page) {
 			upperPageIndex = pageIndex;
 			lowerPageIndex = pageIndex;
-			addPageAtEnd(page);
+			appendPage(page);
 			lowerBoundary = 0;
 			upperBoundary = _getHeight(page);
 		} else {
@@ -81,33 +96,46 @@ module.exports = function (options) {
 		}
 	}
 
-	container.addEventListener('scroll', function () {
+	function getScroll() {
+
+		if(viewport == window) {
+			return document.body.scrollTop;
+		} else {
+			return viewport.scrollTop;
+		}
+	}
+
+	viewport.addEventListener('scroll', function () {
 		var page;
 		if(_forwardScrolling()) {
 			//  check upper boundary here for page change
+/*
+			if(getScroll() > upperBoundary) {
 
-			if(container.scrollTop > upperBoundary) {
-				pageIndex++;
+				if(pageData[pageIndex + 1]) {
+					pageIndex++;
 
-				lowerBoundary = upperBoundary;
-				upperBoundary = upperBoundary + pageCache[pageIndex].height;
+					lowerBoundary = upperBoundary;
+					upperBoundary = upperBoundary + pageData[pageIndex].height;
 
-				//  todo: configure to be pushState or replaceState
-				history.pushState(null, null, pageIndex);
+					//  todo: configure to be pushState or replaceState
+					history.pushState(null, null, pageIndex);
 
 				//  todo: implement pagination buttons?
+				}
 
-			}
+
+			}*/
 
 			if(beyondUpperLimit()) {
 				page = _getPage(upperPageIndex + 1);
 				if(page) {
 					upperPageIndex++;
-					addPageAtEnd(page);
-					pageCache[upperPageIndex].height = _getHeight(page);
+					appendPage(page);
+					pageData[upperPageIndex].height = _getHeight(page);
 					numberOfRenderedPages++;
-					if(numberOfRenderedPages > numberOfPagesToRender) {
-						removeEarlierPage();
+					if(numberOfRenderedPages > config.numberOfPagesToRender) {
+						removeFirstPage();
 						numberOfRenderedPages--;
 						lowerPageIndex++;
 					}
@@ -116,119 +144,110 @@ module.exports = function (options) {
 		} else {
 
 			//  check lower boundary here for page change
-			if(container.scrollTop < lowerBoundary) {
+			/*if(getScroll() < lowerBoundary) {
 				pageIndex--;
 
 				upperBoundary = lowerBoundary;
-				lowerBoundary = lowerBoundary - pageCache[pageIndex].height;
+				lowerBoundary = lowerBoundary - pageData[pageIndex].height;
 
 				//  todo: configure to be pushState or replaceState
 				history.pushState(null, null, pageIndex);
-			}
+			}*/
 
 			if(beforeLowerLimit()) {
 				page = _getPage(lowerPageIndex - 1);
 				if(page) {
 					lowerPageIndex--;
-					addPageAtStart(page);
-					pageCache[lowerPageIndex].height = _getHeight(page);
+					prependPage(page);
+					pageData[lowerPageIndex].height = _getHeight(page);
 					numberOfRenderedPages++;
-					if(numberOfRenderedPages > numberOfPagesToRender) {
-						removeLaterPage();
+					if(numberOfRenderedPages > config.numberOfPagesToRender) {
+						removeLastPage();
 						numberOfRenderedPages--;
 						upperPageIndex--;
 					}
 				}
 			}
+
 		}
 		//  keep track of scrolling position
-		previousScroll = container.scrollTop;
+		previousScroll = getScroll();
 	});
 
-	function addPageAtEnd(page) {
-		innerContainer.appendChild(page);
+	function appendPage(page) {
+		pageContainer.appendChild(page);
 	}
 
-	function addPageAtStart(page) {
-		var scroll = container.scrollTop;
-		_appendFirstChild(innerContainer, page);
+	function prependPage(page) {
+		_appendFirstChild(pageContainer, page);
 		var pageHeight = _getHeight(page);
-		container.scrollTop = scroll + pageHeight;
+		offset -= pageHeight;
+		pageContainer.style.paddingTop = offset + 'px';
 		// recalculate upper and lower boundaries
-		lowerBoundary+=pageHeight;
-		upperBoundary+=pageHeight;
+		//lowerBoundary+=pageHeight;
+		//upperBoundary+=pageHeight;
 	}
 
-	function removeEarlierPage() {
-		var pageToRemove = innerContainer.firstElementChild;
+	function removeFirstPage() {
+		var pageToRemove = pageContainer.firstElementChild;
 		var pageHeight = _getHeight(pageToRemove);
-		innerContainer.removeChild(pageToRemove);
+		pageContainer.removeChild(pageToRemove);
+		offset += pageHeight;
+		pageContainer.style.paddingTop = offset + 'px';
 
 		// recalculate upper and lower boundaries
-		container.scrollTop = container.scrollTop - pageHeight;
-		lowerBoundary-=pageHeight;
-    upperBoundary-=pageHeight;
+
+		//lowerBoundary-=pageHeight;
+    //upperBoundary-=pageHeight;
 	}
 
-	function removeLaterPage() {
-		var pageToRemove = innerContainer.lastElementChild;
-		innerContainer.removeChild(pageToRemove);
+	function removeLastPage() {
+		var pageToRemove = pageContainer.lastElementChild;
+		pageContainer.removeChild(pageToRemove);
 	}
 
 	//  detects when page has been scrolled after rendered content
 	function beyondUpperLimit() {
-		return container.scrollTop + 50 > (_getHeight(innerContainer) - _getHeight(container));
+
+		return  getScroll() + 50 >  _getHeight(pageContent) - getViewportHeight();
 	}
 
 	//  detects when page has been scrolled before rendered content
 	function beforeLowerLimit() {
-		return container.scrollTop < 50;
+
+		return pageContainer.getBoundingClientRect().top + offset > -50;
 	}
 
 	// utility functions
 
 	//  are we scrolling forwards or backwards
 	function _forwardScrolling () {
-		return container.scrollTop > previousScroll;
+		return getScroll() > previousScroll;
 	}
 
 	//  returns page element or false if no page is available
 	function _getPage(pageIndex) {
-
-		var pageData = pageCache[pageIndex];
-
-		if(!pageData) {
-			pageData = config.getPage(pageIndex);
-		}
-
-		if(pageData) {
-			pageCache[pageIndex] = pageData;
-			return _createPageElement(pageData);
-		} else {
-			return false;
-		}
-	}
-
-	//  overridable
-	function _createPageElement(pageData) {
-
-		var el = document.createElement('div');
-		el.className = 'page';
-		el.textContent = pageData.text;
-		return el;
+		pageData[pageIndex] = {};
+		return config.getPage(pageIndex);
 	}
 
 	//  measures height of page
 	function _getHeight(page) {
-		return page.clientHeight;
+		return page.getBoundingClientRect().height;
+	}
+
+	function getViewportHeight() {
+		if(viewport == window) {
+			return window.innerHeight;
+		} else {
+			return viewport.getBoundingClientRect().height;
+		}
 	}
 
 	//  utility method for adding an element as the first child of a parent.
 	function _appendFirstChild(parent, child) {
 		parent.insertBefore(child, parent.firstElementChild);
 	}
-
-
 }
 
 
