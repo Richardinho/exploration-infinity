@@ -112,12 +112,20 @@ module.exports = function (viewport, container, options) {
 
 	//  detects when page has been scrolled after rendered content
 	function _atEnd() {
-		return container.getBoundingClientRect().bottom <= _getViewportHeight() + 50;
+		if(viewport == window) {
+			return container.getBoundingClientRect().bottom <= _getViewportHeight() + 50;
+		} else {
+			return _getScroll() + 50 > container.getBoundingClientRect().height - _getViewportHeight();
+		}
 	}
 
 	//  detects when page has been scrolled before rendered content
 	function _atStart() {
-		return container.getBoundingClientRect().top + parseInt(container.style.paddingTop, 10) >= 0;
+		if(viewport === window) {
+			return container.getBoundingClientRect().top + getContainerPaddingTop() > 0;
+		} else {
+			return _getScroll() + 50 < getContainerPaddingTop();
+		}
 	}
 
 	//  are we scrolling forwards or backwards

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<style>
+		body {
+			margin : 0;
+		}
+		h1 {
+			margin : 0;
+		}
+		* {
+			box-sizing : box-model;
+		}
+
+		#page-container {
+			width : 400px;
+			height : 200px;
+			border : solid 1px red;
+			margin : auto;
+			margin-top : 100px;
+			overflow-y : scroll;
+		}
+
+		.header {
+			background : yellow;
+			padding : 20px;
+		}
+
+		.page {
+			font-size : 1em;
+			overflow : hidden;
+			padding : 12px;
+		}
+
+		.page img {
+			max-width : 50%;
+			float : left;
+			margin-right : 12px;
+			margin-bottom : 12px;
+
+		}
+
+		.page.small {
+			background : limegreen;
+		}
+		.page.medium {
+			background : blue;
+			font-size : 2em;
+		}
+		.page.large {
+			background : cornflowerblue;
+			font-size : 3em;
+		}
+
+		</style>
+</head>
+<body>
+	<h1 class='header'>infinite scroll</h1>
+	<div id='page-container'><div id='inner-container'></div></div>
+
+	<script src="jspm_packages/system.js"></script>
+	<script src="config.js"></script>
+	<script>
+    System.import('main2.js');
+  </script>
+</body>
+</html>
