@@ -7,7 +7,7 @@ module.exports = function (viewport, container, options) {
 	var defaults = {
 		numberOfPagesToRender : 4,
 		pushState : true,
-		paginationButtons : false,
+		paginationButtons : true,
 		cachePages : true,
 		createPageElement : function () {},
 		pageNumbers : false,
@@ -17,6 +17,8 @@ module.exports = function (viewport, container, options) {
 			}
 		}
 	};
+
+	var offset = 0;
 
 	var config = _.extend({}, defaults, options);
 
@@ -35,7 +37,6 @@ module.exports = function (viewport, container, options) {
 	handleRequest();
 
 	function handleRequest() {
-		container.innerHTML = '';
 		numberOfRenderedPages = 0;
 		previousScroll = 0;
 		container.style.paddingTop = "0";
@@ -58,7 +59,7 @@ module.exports = function (viewport, container, options) {
 					firstRenderedPageIndex--;
 					_prependPage(page);
 					numberOfRenderedPages++;
-					if(numberOfRenderedPages > config.numberOfPagesToRender) {
+					if(numberOfRenderedPages >= config.numberOfPagesToRender) {
 						_removeLastPage();
 						numberOfRenderedPages--;
 						lastRenderedPageIndex--;
@@ -67,12 +68,13 @@ module.exports = function (viewport, container, options) {
 			}
 		} else {
 			if(_atEnd()) {
+				console.log('at end');
 				page = _getPage(lastRenderedPageIndex + 1);
 				if(page) {
 					lastRenderedPageIndex++;
 					_appendPage(page);
 					numberOfRenderedPages++;
-					if(numberOfRenderedPages > config.numberOfPagesToRender) {
+					if(numberOfRenderedPages >= config.numberOfPagesToRender) {
 						_removeFirstPage();
 						numberOfRenderedPages--;
 						firstRenderedPageIndex++;
@@ -89,24 +91,31 @@ module.exports = function (viewport, container, options) {
 	}
 
 	function _prependPage(page) {
+		console.log('prepend page');
 		_prependChild(container, page);
 		var pageHeight = _getHeight(page);
-		container.style.paddingTop = getContainerPaddingTop() - pageHeight + 'px';
+		offset-=pageHeight;
+		container.style.paddingTop = offset + 'px';
 	}
 
 	function _removeFirstPage() {
 		var pageToRemove = container.firstElementChild;
 		var pageHeight = _getHeight(pageToRemove);
 		container.removeChild(pageToRemove);
-		container.style.paddingTop = getContainerPaddingTop() + pageHeight + 'px';
+		offset+=pageHeight;
+		container.style.paddingTop = offset + 'px';
 	}
 
 	function getContainerPaddingTop() {
 		return container.firstElementChild.getBoundingClientRect().top - container.getBoundingClientRect().top;
 	}
 
+	function getLastContainerChild() {
+		return container.lastElementChild;
+	}
+
 	function _removeLastPage() {
-		var pageToRemove = container.lastElementChild;
+		var pageToRemove = getLastContainerChild();
 		container.removeChild(pageToRemove);
 	}
 

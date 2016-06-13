@@ -21,6 +21,7 @@
 			margin : auto;
 			margin-top : 100px;
 			overflow-y : scroll;
+			position : relative;
 		}
 
 		.header {
@@ -54,11 +55,22 @@
 			font-size : 3em;
 		}
 
+		.pagination-buttons {
+			padding : 12px;
+			background : pink;
+			text-align : center;
+		}
+
+
+
 		</style>
 </head>
 <body>
 	<h1 class='header'>infinite scroll</h1>
-	<div id='page-container'><div id='inner-container'></div></div>
+	<div id='page-container'>
+		<div id='inner-container'></div>
+	</div>
+	<div class='pagination-buttons'>&lt; 1 2 3 4 5 6 &gt;</div>
 
 	<script src="jspm_packages/system.js"></script>
 	<script src="config.js"></script>
