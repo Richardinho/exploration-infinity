@@ -31,19 +31,20 @@ function getLargeText(text) {
 }
 
 
-explorationInfinity({
-	getPage : function (pageIndex) {
-		var pageData = pagesService[pageIndex];
-		if(pageData) {
-			return _createPageElement(pageData);
-		} else {
-			return false;
+explorationInfinity(
+	window,
+	document.querySelector('#page-container'),
+	{
+		getPage : function (pageIndex) {
+			var pageData = pagesService[pageIndex];
+			if(pageData) {
+				return _createPageElement(pageData);
+			} else {
+				return false;
+			}
 		}
-	},
-	viewport : window,
-	pageContent : document.body,
-	pageContainer : document.querySelector('#page-container')
-});
+	}
+);
 
 	//  overridable
 	function _createPageElement(pageData) {
