@@ -1,0 +1,32 @@
+* {
+	box-sizing : border-box;
+}
+
+body {
+	margin : 0;
+}
+
+.header{
+	height : 100px;
+	background : cadetblue;
+}
+
+.alpha {
+	height : 300px;
+	background : mediumspringgreen;
+}
+
+.beta {
+	height : 700px;
+	background : lavender;
+}
+
+.gamma {
+	height : 500px;
+	background : cadetblue;
+}
+
+.delta {
+	height : 400px;
+	background : ghostwhite;
+}
