@@ -2,142 +2,159 @@
 
 	'use strict';
 
-	window.onload = function () {
+	(function(factory) {
+		if (typeof require === 'function' && typeof module !== 'undefined' && module.exports) {
+			module.exports = factory(require('backbone'));
+		} else if (typeof define === 'function') {
+			define(['backbone'], factory);
+		} else {
+			window.explorationInfinity = factory(Backbone);
+		}
+	}(function (Backbone) {
 
-		var container = document.getElementById('container');
+		return function () {
+			console.log('hello rich this is INFINITY!!');
+			window.onload = function () {
 
-		var firstRenderedPageIndex;
-		var lastRenderedPageIndex;
+				var container = document.getElementById('container');
 
-		//  maximum number of pages to render at any time, after which we start removing them
-		//  from the top or the bottom.
-		var maxPagesToRender = 5;
+				var firstRenderedPageIndex;
+				var lastRenderedPageIndex;
 
-		var numberOfPagesRendered = 0;
+				//  maximum number of pages to render at any time, after which we start removing them
+				//  from the top or the bottom.
+				var maxPagesToRender = 5;
 
-		var currentPage;
-		var currentPageIndex;
+				var numberOfPagesRendered = 0;
 
-		setTimeout(function () {  //  hack to get round Chrome's remembering scroll
+				var currentPage;
+				var currentPageIndex;
 
-			function pageController() {
-				var pageNumber = parseInt(arguments[0], 10);
-				var page = getPage(pageNumber);
-				if(page) {
-					currentPage = page;
-					currentPageIndex = pageNumber;
-					if(pageNumber > 0) {
-						firstRenderedPageIndex = pageNumber - 1;
-						var prevPage = getPage(firstRenderedPageIndex);
-						container.appendChild(prevPage);
-						numberOfPagesRendered++;
-						container.appendChild(page);
-						numberOfPagesRendered++;
-						var heightPrevPage = prevPage.getBoundingClientRect().bottom;
-						window.scrollBy(0, heightPrevPage);
+				setTimeout(function () {  //  hack to get round Chrome's remembering scroll
 
-					} else {
-						firstRenderedPageIndex = pageNumber;
-						container.appendChild(page);
-						numberOfPagesRendered++;
-					}
-					var nextPage = getPage(pageNumber + 1);
-					if(nextPage) {
-						container.appendChild(nextPage);
-						numberOfPagesRendered++;
-						lastRenderedPageIndex = pageNumber + 1;
-					} else {
-						lastRenderedPageIndex = pageNumber;
-					}
-				}
-			}
+					function pageController() {
+						var pageNumber = parseInt(arguments[0], 10);
+						var page = getPage(pageNumber);
+						if(page) {
+							currentPage = page;
+							currentPageIndex = pageNumber;
+							if(pageNumber > 0) {
+								firstRenderedPageIndex = pageNumber - 1;
+								var prevPage = getPage(firstRenderedPageIndex);
+								container.appendChild(prevPage);
+								numberOfPagesRendered++;
+								container.appendChild(page);
+								numberOfPagesRendered++;
+								var heightPrevPage = prevPage.getBoundingClientRect().bottom;
+								window.scrollBy(0, heightPrevPage);
 
-			var router = new Router({
-				pageController : pageController
-			});
-
-			Backbone.history.start({ pushState: true });
-
-			var previousScroll = 0;
-			var currentScroll = 0;
-
-			window.addEventListener('scroll', function () {
-				var newPage;
-				//  scrolling forwards
-				if(getWindowScroll() > previousScroll) {
-
-					if(currentPage.getBoundingClientRect().bottom < 0) {
-						currentPageIndex++;
-						currentPage = getPage(currentPageIndex);
-						router.navigate('page/' + currentPageIndex, { replace : true });
-					}
-
-					if(_atEnd()) {
-						newPage = getPage(lastRenderedPageIndex + 1);
-						if(newPage) {
-							container.appendChild(newPage);
-							numberOfPagesRendered++;
-							if(numberOfPagesRendered > maxPagesToRender) {
-								var pageToRemove = container.firstElementChild;
-								var heightOfPageToRemove = pageToRemove.getBoundingClientRect().height;
-								container.removeChild(container.firstElementChild);
-								numberOfPagesRendered--;
-								firstRenderedPageIndex++;
-								window.scrollBy(0, -1 * heightOfPageToRemove);
+							} else {
+								firstRenderedPageIndex = pageNumber;
+								container.appendChild(page);
+								numberOfPagesRendered++;
 							}
-							lastRenderedPageIndex++;
+							var nextPage = getPage(pageNumber + 1);
+							if(nextPage) {
+								container.appendChild(nextPage);
+								numberOfPagesRendered++;
+								lastRenderedPageIndex = pageNumber + 1;
+							} else {
+								lastRenderedPageIndex = pageNumber;
+							}
+						}
+					}
 
+					var router = new Router({
+						pageController : pageController
+					});
+
+					Backbone.history.start({ pushState: true });
+
+					var previousScroll = 0;
+					var currentScroll = 0;
+
+					window.addEventListener('scroll', function () {
+						var newPage;
+						//  scrolling forwards
+						if(getWindowScroll() > previousScroll) {
+
+							if(currentPage.getBoundingClientRect().bottom < 0) {
+								currentPageIndex++;
+								currentPage = getPage(currentPageIndex);
+								router.navigate('page/' + currentPageIndex, { replace : true });
+							}
+
+							if(_atEnd()) {
+								newPage = getPage(lastRenderedPageIndex + 1);
+								if(newPage) {
+									container.appendChild(newPage);
+									numberOfPagesRendered++;
+									if(numberOfPagesRendered > maxPagesToRender) {
+										var pageToRemove = container.firstElementChild;
+										var heightOfPageToRemove = pageToRemove.getBoundingClientRect().height;
+										container.removeChild(container.firstElementChild);
+										numberOfPagesRendered--;
+										firstRenderedPageIndex++;
+										window.scrollBy(0, -1 * heightOfPageToRemove);
+									}
+									lastRenderedPageIndex++;
+
+								} else {
+
+									console.log('no pages left');
+								}
+								//  add new page if it exists
+							}
 						} else {
 
-							console.log('no pages left');
-						}
-						//  add new page if it exists
-					}
-				} else {
-
-					if(currentPage.getBoundingClientRect().top > 0) {
-						if(currentPageIndex > 0) {
-							currentPageIndex--;
-							currentPage = getPage(currentPageIndex);
-							router.navigate('page/' + currentPageIndex, { replace : true });
-						}
-					}
-					if(_atStart() && firstRenderedPageIndex > 0) {
-						newPage = getPage(firstRenderedPageIndex - 1);
-						if(newPage) {
-							prependChild(container, newPage);
-							firstRenderedPageIndex--;
-							numberOfPagesRendered++;
-							if(numberOfPagesRendered > maxPagesToRender) {
-								container.removeChild(container.lastElementChild);
-								numberOfPagesRendered--;
-								lastRenderedPageIndex--;
+							if(currentPage.getBoundingClientRect().top > 0) {
+								if(currentPageIndex > 0) {
+									currentPageIndex--;
+									currentPage = getPage(currentPageIndex);
+									router.navigate('page/' + currentPageIndex, { replace : true });
+								}
 							}
-							var newHeight = newPage.getBoundingClientRect().height;
-							//setScroll(document.body.scrollTop + newHeight);
-							window.scrollBy(0, newHeight);
+							if(_atStart() && firstRenderedPageIndex > 0) {
+								newPage = getPage(firstRenderedPageIndex - 1);
+								if(newPage) {
+									prependChild(container, newPage);
+									firstRenderedPageIndex--;
+									numberOfPagesRendered++;
+									if(numberOfPagesRendered > maxPagesToRender) {
+										container.removeChild(container.lastElementChild);
+										numberOfPagesRendered--;
+										lastRenderedPageIndex--;
+									}
+									var newHeight = newPage.getBoundingClientRect().height;
+									//setScroll(document.body.scrollTop + newHeight);
+									window.scrollBy(0, newHeight);
+								}
+								// prepend page if it exists
+							}
 						}
-						// prepend page if it exists
-					}
-				}
-				previousScroll = getWindowScroll();
-			});
-		}, 0);
-	}
+						previousScroll = getWindowScroll();
+					});
+				}, 0);
+			}
 
-	function getWindowScroll() {
-		return window.scrollY;
-	}
+			function getWindowScroll() {
+				return window.scrollY;
+			}
 
-	function prependChild(parent, child) {
-		parent.insertBefore(child, parent.firstElementChild);
-	}
+			function prependChild(parent, child) {
+				parent.insertBefore(child, parent.firstElementChild);
+			}
 
-	function _atStart() {
-		return container.getBoundingClientRect().top > -10;
-	}
-	function _atEnd() {
-		return container.getBoundingClientRect().bottom < window.innerHeight + 10;
-	}
+			function _atStart() {
+				return container.getBoundingClientRect().top > -10;
+			}
+			function _atEnd() {
+				return container.getBoundingClientRect().bottom < window.innerHeight + 10;
+			}
+		};
+
+	}));
+
+
 
 })();
