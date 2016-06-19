@@ -2,7 +2,7 @@
   "name": "exploration-infinity",
   "version": "1.0.0",
   "description": "",
-  "main": "src/infinite-scroll.js",
+  "main": "web/js/bootstrap.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
