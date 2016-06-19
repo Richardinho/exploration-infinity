@@ -19,3 +19,5 @@ function getPage(pageIndex) {
 		return page;
 	}
 }
+
+module.exports = getPage;

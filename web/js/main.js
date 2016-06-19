@@ -1,16 +1,24 @@
-(function () {
++function () {
 
 	'use strict';
 
+
 	(function(factory) {
 		if (typeof require === 'function' && typeof module !== 'undefined' && module.exports) {
-			module.exports = factory(require('backbone'));
+
+			module.exports = factory(require('backbone'), require('page-service'), require('router'));
 		} else if (typeof define === 'function') {
-			define(['backbone'], factory);
+			define(['backbone', 'page-service', 'router'], factory);
 		} else {
-			window.explorationInfinity = factory(Backbone);
+			window.explorationInfinity = factory(Backbone, getPage, Router);
 		}
-	}(function (Backbone) {
+	}(function (Backbone, getPage, Router) {
+
+
+		var defaults = {
+			maxPagesToRender : 5
+
+		};
 
 		return function () {
 			console.log('hello rich this is INFINITY!!');
@@ -157,4 +165,4 @@
 
 
 
-})();
+}();

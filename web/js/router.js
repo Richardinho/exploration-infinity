@@ -1,4 +1,4 @@
-var Router = Backbone.Router.extend({
+module.exports = Backbone.Router.extend({
 	initialize : function (options) {
 		this.pageController = options.pageController
 	},
