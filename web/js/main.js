@@ -6,7 +6,7 @@
 	(function(factory) {
 		if (typeof require === 'function' && typeof module !== 'undefined' && module.exports) {
 
-			module.exports = factory(require('backbone'), require('page-service'), require('router'));
+			module.exports = factory(require('backbone'), require('./page-service'), require('./router'));
 		} else if (typeof define === 'function') {
 			define(['backbone', 'page-service', 'router'], factory);
 		} else {
