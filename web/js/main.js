@@ -53,8 +53,7 @@
 		});
 
 		return function () {
-			console.log('hello rich this is INFINITY!!');
-			window.onload = function () {
+
 
 				var container = document.getElementById('container');
 
@@ -191,7 +190,6 @@
 			function _atEnd() {
 				return container.getBoundingClientRect().bottom < window.innerHeight + 10;
 			}
-		};
 
 	}));
 
