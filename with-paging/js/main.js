@@ -9,6 +9,12 @@
 		var firstRenderedPageIndex;
 		var lastRenderedPageIndex;
 
+		//  maximum number of pages to render at any time, after which we start removing them
+		//  from the top or the bottom.
+		var maxPagesToRender = 5;
+
+		var numberOfPagesRendered = 0;
+
 		var currentPage;
 		var currentPageIndex;
 
@@ -24,17 +30,21 @@
 						firstRenderedPageIndex = pageNumber - 1;
 						var prevPage = getPage(firstRenderedPageIndex);
 						container.appendChild(prevPage);
+						numberOfPagesRendered++;
 						container.appendChild(page);
+						numberOfPagesRendered++;
 						var heightPrevPage = prevPage.getBoundingClientRect().bottom;
-						setScroll(heightPrevPage);
+						window.scrollBy(0, heightPrevPage);
 
 					} else {
 						firstRenderedPageIndex = pageNumber;
 						container.appendChild(page);
+						numberOfPagesRendered++;
 					}
 					var nextPage = getPage(pageNumber + 1);
 					if(nextPage) {
 						container.appendChild(nextPage);
+						numberOfPagesRendered++;
 						lastRenderedPageIndex = pageNumber + 1;
 					} else {
 						lastRenderedPageIndex = pageNumber;
@@ -54,7 +64,7 @@
 			window.addEventListener('scroll', function () {
 				var newPage;
 				//  scrolling forwards
-				if(document.body.scrollTop > previousScroll) {
+				if(getWindowScroll() > previousScroll) {
 
 					if(currentPage.getBoundingClientRect().bottom < 0) {
 						currentPageIndex++;
@@ -66,6 +76,15 @@
 						newPage = getPage(lastRenderedPageIndex + 1);
 						if(newPage) {
 							container.appendChild(newPage);
+							numberOfPagesRendered++;
+							if(numberOfPagesRendered > maxPagesToRender) {
+								var pageToRemove = container.firstElementChild;
+								var heightOfPageToRemove = pageToRemove.getBoundingClientRect().height;
+								container.removeChild(container.firstElementChild);
+								numberOfPagesRendered--;
+								firstRenderedPageIndex++;
+								window.scrollBy(0, -1 * heightOfPageToRemove);
+							}
 							lastRenderedPageIndex++;
 
 						} else {
@@ -84,24 +103,30 @@
 						}
 					}
 					if(_atStart() && firstRenderedPageIndex > 0) {
-						console.log('at start');
 						newPage = getPage(firstRenderedPageIndex - 1);
 						if(newPage) {
 							prependChild(container, newPage);
 							firstRenderedPageIndex--;
+							numberOfPagesRendered++;
+							if(numberOfPagesRendered > maxPagesToRender) {
+								container.removeChild(container.lastElementChild);
+								numberOfPagesRendered--;
+								lastRenderedPageIndex--;
+							}
 							var newHeight = newPage.getBoundingClientRect().height;
-							setScroll(document.body.scrollTop + newHeight);
+							//setScroll(document.body.scrollTop + newHeight);
+							window.scrollBy(0, newHeight);
 						}
 						// prepend page if it exists
 					}
 				}
-				previousScroll = document.body.scrollTop;
+				previousScroll = getWindowScroll();
 			});
 		}, 0);
 	}
 
-	function setScroll(amount) {
-		document.body.scrollTop = amount;
+	function getWindowScroll() {
+		return window.scrollY;
 	}
 
 	function prependChild(parent, child) {
