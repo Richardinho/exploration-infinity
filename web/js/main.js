@@ -6,19 +6,51 @@
 	(function(factory) {
 		if (typeof require === 'function' && typeof module !== 'undefined' && module.exports) {
 
-			module.exports = factory(require('backbone'), require('./page-service'), require('./router'));
+			module.exports = factory(require('backbone'));
 		} else if (typeof define === 'function') {
-			define(['backbone', 'page-service', 'router'], factory);
+			define(['backbone'], factory);
 		} else {
-			window.explorationInfinity = factory(Backbone, getPage, Router);
+			window.explorationInfinity = factory(Backbone);
 		}
-	}(function (Backbone, getPage, Router) {
+	}(function (Backbone) {
 
 
 		var defaults = {
 			maxPagesToRender : 5
 
 		};
+
+		var max = 10;
+
+		var pages = [];
+
+		function getPage(pageIndex) {
+
+			if(pageIndex > max) return;
+
+			if(pages[pageIndex]) {
+				return pages[pageIndex];
+			} else {
+
+				var page = document.createElement('div');
+				page.textContent = 'page ' + pageIndex;
+				page.className = 'page';
+				pages[pageIndex] = page;
+				return page;
+			}
+		}
+
+		var Router = Backbone.Router.extend({
+			initialize : function (options) {
+				this.pageController = options.pageController
+			},
+			routes : {
+				'page/:pageNumber' : 'handlePage'
+			},
+			handlePage : function (pageNumber) {
+				this.pageController(pageNumber);
+			}
+		});
 
 		return function () {
 			console.log('hello rich this is INFINITY!!');
