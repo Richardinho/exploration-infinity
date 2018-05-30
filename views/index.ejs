@@ -9,10 +9,10 @@
 <body>
 	<h1 class='header'>container</h1>
 	<div id='container'></div>
-	<script>
-
-		explorationInfinity();
-	</script>
-
+  <ul>
+    <% results.forEach(function(result){ %>
+     <li><%=result.name %></li>
+    <% }); %>
+  </ul>
 </body>
 </html>

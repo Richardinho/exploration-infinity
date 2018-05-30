@@ -1,7 +1,7 @@
 +function () {
 
 	'use strict';
-
+console.log('hello');
 
 	(function(factory) {
 		if (typeof require === 'function' && typeof module !== 'undefined' && module.exports) {
