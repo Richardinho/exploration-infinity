@@ -14,9 +14,14 @@ body {
 	border-bottom : solid 1px #333;
 	background : #eee;
 }
+.results {
+  padding: 12px;
+  width: 300px;
+  margin: auto;
+}
 
-.page {
-	background : pink;
-	min-height : 100vh;
-	border : solid 1px black;
+.card {
+  background: pink;
+  padding: 12px;
+  margin-bottom: 12px;
 }
